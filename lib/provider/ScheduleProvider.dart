@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:hiter/model/CourseModel.dart';
 import '../service/common.dart';
 
 class SchedulePageProvider with ChangeNotifier {

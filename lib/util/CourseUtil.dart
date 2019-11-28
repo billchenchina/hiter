@@ -85,7 +85,6 @@ List getFilledCourses({
 /// Process `courses: List<CourseModel|EmptyModel>`,
 /// then return a new list of type `List<CourseModel|EmptyModel|List<CourseModel>>`.
 List _handleValidOverlayCourses(List courses) {
-  // TODO: improve algorithm
   if (courses.length == 0) return [];
 
   courses.sort((a, b) => a.start - b.start);

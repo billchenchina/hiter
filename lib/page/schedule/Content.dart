@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hiter/page/schedule/Course.dart';
 import 'package:hiter/service/common.dart';
-import 'package:provider/provider.dart';
 
 class Content extends StatelessWidget {
   Content({Key key}) : super(key: key);

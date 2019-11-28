@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:hiter/model/CourseModel.dart';
-import 'package:hiter/provider/ScheduleProvider.dart';
 import 'package:hiter/service/common.dart';
 import 'package:hiter/service/const.dart';
 import 'package:hiter/util/CourseUtil.dart';
