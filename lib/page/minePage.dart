@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 
+import 'mine/mine.dart';
+
 class MinePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Text('MinePages'),
+      appBar: AppBar(
+        title: Text('Mine'),
       ),
+      body: Mine(),
     );
   }
 }

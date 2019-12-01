@@ -3,9 +3,11 @@ import 'dart:math';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:hiter/model/CourseModel.dart';
+import 'package:hiter/provider/ScheduleProvider.dart';
 import 'package:hiter/service/common.dart';
 import 'package:hiter/service/const.dart';
 import 'package:hiter/util/CourseUtil.dart';
+import 'package:provider/provider.dart';
 
 import 'CourseSetting.dart';
 import 'EmptyBox.dart';
@@ -68,7 +70,9 @@ class _CourseColumnState extends State<CourseColumn> {
 
     return Column(
       children: c.map((item) {
-        if (item is CourseModel) {
+        if ((item is CourseModel) &&
+            (item.weeks.contains(
+                Provider.of<SchedulePageProvider>(context).getShowWeek()))) {
           return CourseItem(
             courseInfoList: [item],
             minHeight: widget.minItemHeight,
@@ -112,8 +116,17 @@ class _CourseItemState extends State<CourseItem> {
   Widget build(BuildContext context) {
     int maxStart = 0;
     int maxStep = 0;
-    final courses = widget.courseInfoList.reversed;
 
+    var schedulePage = Provider.of<SchedulePageProvider>(context);
+    List<CourseModel> showCourses = widget.courseInfoList;
+
+    showCourses.sort((a, b) {
+      if (a.weeks.contains(schedulePage.getShowWeek())) {
+        return -1;
+      }
+      return 1;
+    });
+    final courses = showCourses.reversed;
     courses.forEach((info) {
       if (info.start > maxStart) maxStart = info.start;
       if (info.step > maxStep) maxStep = info.step;
@@ -158,7 +171,7 @@ class _CourseItemState extends State<CourseItem> {
             barrierDismissible: true,
             builder: (BuildContext ctx0) {
               if (courses.length == 1) {
-                return CourseSettings(
+                return CourseSettingContainer(
                   title: '修改课程',
                   course: courses.first,
                   modifying: true,
@@ -172,7 +185,8 @@ class _CourseItemState extends State<CourseItem> {
                       crossAxisCount: 2,
                     ),
                     children: courses.map((course) {
-                      bool isCurWeek = course.weeks.contains(currentWeekFs);
+                      bool isCurWeek =
+                          course.weeks.contains(schedulePage.getShowWeek());
                       return GridTile(
                         child: GestureDetector(
                           child: Container(
@@ -192,7 +206,7 @@ class _CourseItemState extends State<CourseItem> {
                             showDialog(
                               context: ctx0,
                               builder: (BuildContext _) {
-                                return CourseSettings(
+                                return CourseSettingContainer(
                                   title: '修改课程',
                                   course: course,
                                   modifying: true,
@@ -228,7 +242,10 @@ class CourseItemChild extends StatefulWidget {
 class _CourseItemChildState extends State<CourseItemChild> {
   @override
   Widget build(BuildContext context) {
-    bool isCurWeek = widget.courseInfo.weeks.contains(currentWeekFs);
+    var schedulePage = Provider.of<SchedulePageProvider>(context);
+
+    bool isCurWeek =
+        widget.courseInfo.weeks.contains(schedulePage.getShowWeek());
 
     return Container(
       constraints: BoxConstraints(
@@ -237,7 +254,7 @@ class _CourseItemChildState extends State<CourseItemChild> {
       ),
       margin: EdgeInsets.all(0.5),
       decoration: BoxDecoration(
-        color: isCurWeek ? COURSE_MD_COLORS[Random().nextInt(10)] : Colors.grey,
+        color: isCurWeek ? COURSE_MD_COLORS[Random().nextInt(9)] : Colors.grey,
         borderRadius: BorderRadius.all(Radius.circular(5.0)),
       ),
       child: AutoSizeText(
@@ -245,7 +262,7 @@ class _CourseItemChildState extends State<CourseItemChild> {
         minFontSize: 12 *
             MediaQuery.of(context).size.height /
             MediaQuery.of(context).size.width /
-            1.5,
+            2,
         softWrap: true,
         style: TextStyle(
           color: isCurWeek ? Colors.white : Colors.white,

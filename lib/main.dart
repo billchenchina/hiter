@@ -7,8 +7,8 @@ import './service/common.dart';
 import './service/const.dart';
 import './service/preload.dart';
 
-void main() {
-  init();
+void main() async {
+  await init();
   runApp(MyApp());
 }
 
@@ -18,6 +18,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     print('根部重建：$context');
+
 
     return ChangeNotifierProvider<AppProvider>.value(
       value: app,

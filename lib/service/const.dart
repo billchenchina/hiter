@@ -21,10 +21,13 @@ const COURSE_MD_COLORS = [
   Colors.orange,
   Colors.deepPurple,
   Colors.pink,
-  Colors.grey,
   Colors.teal,
   Colors.brown,
 ];
+
+const PREFS_U_USRID = 'uUsrId';
+
+const PREFS_U_USRPASSWORD = 'uUsrPassword';
 
 const DEFAULT_THEME = '知乎蓝';
 
@@ -32,6 +35,8 @@ const PREFS_SELECTED_THEME = 'selectedColor';
 
 const PREFS_CURRENT_WEEK = 'currentWeek';
 
-const PREFS_ALL_COURSES = 'allCourses';
+const PREFS_P_COURSES = 'pCourses';
+
+const PREFS_U_COURSES = 'uCourses';
 
 const Weekdays = ['null', '周一', '周二', '周三', '周四', '周五', '周六', '周日'];

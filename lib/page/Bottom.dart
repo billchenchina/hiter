@@ -1,5 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:hiter/page/mine/GetCourseLogin.dart';
+import 'package:hiter/provider/MinePage.dart';
 import 'package:hiter/service/common.dart';
 import 'package:hiter/service/const.dart';
 import 'package:provider/provider.dart';
@@ -11,6 +13,7 @@ import '../provider/AppProvider.dart';
 
 class Bottom extends StatelessWidget {
   final _currentTab = [SchedulePage(), BBSPage(), MinePage()];
+  final hitLoginProvider = HITLoginProvider();
 
   @override
   Widget build(BuildContext context) {
@@ -23,8 +26,12 @@ class Bottom extends StatelessWidget {
         primarySwatch: MD_COLORS[selectedColorFs],
       ),
       home: Scaffold(
+        resizeToAvoidBottomPadding: false,
         body: _currentTab[provider.getCurrentIndex()],
         bottomNavigationBar: BottomNavigationBar(
+          unselectedItemColor: MD_COLORS[provider.getTheme()],
+          fixedColor: MD_COLORS[provider.getTheme()],
+          type: BottomNavigationBarType.shifting,
           currentIndex: provider.getCurrentIndex(),
           onTap: (index) {
             provider.setCurrentIndex(index);

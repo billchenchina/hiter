@@ -3,9 +3,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hiter/View/Toast.dart';
 import 'package:hiter/model/CourseModel.dart';
+import 'package:hiter/provider/AppProvider.dart';
+import 'package:hiter/provider/ScheduleProvider.dart';
 import 'package:hiter/service/common.dart';
 import 'package:hiter/service/const.dart';
 import 'package:hiter/util/CourseUtil.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class CourseSettings extends StatefulWidget {
@@ -34,33 +37,53 @@ class _CourseSettingsState extends State<CourseSettings> {
 
   void _onStartBtnPressed() {
     showModalBottomSheet(
-        context: context,
-        builder: (ctx) {
-          return SizedBox(
-            child: CupertinoPicker(
-              itemExtent: 40,
-              onSelectedItemChanged: (idx) {
+      context: context,
+      builder: (context) {
+        return ListView(
+          children: List.generate(getRowCount(), (index) {
+            return InkWell(
+              child: Container(
+                alignment: Alignment.center,
+                height: 50.0,
+                child: Text('${index + 1}'),
+              ),
+              onTap: () {
                 setState(() {
-                  this.start = idx + 1;
+                  this.start = index + 1;
                   if (this.start + this.step > getRowCount() + 1) {
                     this.step = getRowCount() - this.start + 1;
                   }
                 });
               },
-              children: List.generate(
-                  getRowCount(),
-                      (idx) => Text(
-                    '${idx + 1}',
-                    style: TextStyle(fontSize: 30),
-                  )).toList(),
-            ),
-          );
-        });
+            );
+          }),
+        );
+      },
+    );
   }
 
   void _onStepBtnPressed() {
     showModalBottomSheet(
-        context: context,
+      context: context,
+      builder: (context) {
+        return ListView(
+          children: List.generate(getRowCount(), (index) {
+            return InkWell(
+              child: Container(
+                alignment: Alignment.center,
+                height: 50.0,
+                child: Text('${index + 1}'),
+              ),
+              onTap: () {
+                setState(() {
+                  this.step = index + 1;
+                });
+              },
+            );
+          }),
+        );
+      },
+      /*
         builder: (ctx) {
           return SizedBox(
             child: CupertinoPicker(
@@ -72,13 +95,15 @@ class _CourseSettingsState extends State<CourseSettings> {
               },
               children: List.generate(
                   getRowCount() - this.start + 1,
-                      (idx) => Text(
-                    '${idx + 1}',
-                    style: TextStyle(fontSize: 30),
-                  )).toList(),
+                  (idx) => Text(
+                        '${idx + 1}',
+                        style: TextStyle(fontSize: 30),
+                      )).toList(),
             ),
           );
-        });
+        }
+        */
+    );
   }
 
   CourseModel _removeCurCourse() {
@@ -143,7 +168,7 @@ class _CourseSettingsState extends State<CourseSettings> {
 
   void _changeStorage() {
     SharedPreferences.getInstance().then((p) {
-      p.setString(PREFS_ALL_COURSES,
+      p.setString(PREFS_P_COURSES,
           json.encode(coursesFs.map((v) => v.toMap()).toList()));
     });
     updateState$.add(true);
@@ -324,49 +349,55 @@ class _CourseSettingsState extends State<CourseSettings> {
               leading: Text('时  间  段:'),
               title: Text('开始于: $start, 跨度: $step'),
               children: <Widget>[
-                Row(
+                Column(
                   children: <Widget>[
-                    Expanded(
-                      flex: 50,
-                      child: GestureDetector(
-                        child: Container(
-                          width: MediaQuery.of(context).size.width / 2,
-                          child: Text(
-                            '$start',
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                        onTap: _onStartBtnPressed,
+                    ListTile(
+                      title: Text('start'),
+                      trailing: DropdownButton<int>(
+                        value: start - 1,
+                        onChanged: (index) {
+                          setState(() {
+                            this.start = index + 1;
+                            if (this.start + this.step > getRowCount() + 1) {
+                              this.step = getRowCount() - this.start + 1;
+                            }
+                          });
+                          print(getRowCount() - this.start + 1);
+                        },
+                        items: List.generate(getRowCount(), (index) {
+                          return DropdownMenuItem(
+                            value: index,
+                            child: Text('${index + 1}'),
+                          );
+                        }),
                       ),
                     ),
-                    Expanded(
-                      flex: 1,
-                      child: SizedBox(
-                        width: 0,
-                        height: 50,
+                    ListTile(
+                      title: Text('step'),
+                      trailing: DropdownButton<int>(
+                        value: step - 1,
+                        onChanged: (index) {
+                          setState(() {
+                            this.step = index + 1;
+                          });
+                        },
+                        items: List.generate(getRowCount() - this.start + 1,
+                            (index) {
+                          return DropdownMenuItem(
+                            value: index,
+                            child: Text('${index + 1}'),
+                          );
+                        }),
                       ),
-                    ),
-                    Expanded(
-                      flex: 50,
-                      child: GestureDetector(
-                        child: Container(
-                          width: MediaQuery.of(context).size.width / 2,
-                          child: Text(
-                            '$step',
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                        onTap: _onStepBtnPressed,
-                      ),
-                    ),
+                    )
                   ],
-                ),
+                )
               ],
             ),
             Row(
               children: <Widget>[
                 Expanded(
-                  child: FlatButton(
+                  child: RaisedButton(
                     color: widget.modifying == true ? Colors.red : null,
                     child: Text(
                       widget.modifying == true ? '删除' : '取消',
@@ -392,6 +423,28 @@ class _CourseSettingsState extends State<CourseSettings> {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class CourseSettingContainer extends StatelessWidget {
+  CourseSettingContainer({Key key, this.title, this.course, this.modifying})
+      : super(key: key);
+
+  final String title;
+  final CourseModel course;
+  final bool modifying;
+
+  @override
+  Widget build(BuildContext context) {
+    var app = Provider.of<AppProvider>(context);
+    return Theme(
+      data: ThemeData(primaryColor: MD_COLORS[app.getTheme()]),
+      child: CourseSettings(
+        title: this.title,
+        course: this.course,
+        modifying: this.modifying,
       ),
     );
   }

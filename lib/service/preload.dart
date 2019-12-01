@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:hiter/model/CourseModel.dart';
 import 'package:hiter/service/common.dart';
 import 'package:hiter/service/const.dart';
 import 'package:hiter/service/store.dart';
@@ -12,6 +15,7 @@ Future<void> init() async {
 void preload() {
   _loadTheme();
   _loadCurrentWeek();
+  loadCourses();
 }
 
 void _loadTheme() {
@@ -19,5 +23,21 @@ void _loadTheme() {
 }
 
 void _loadCurrentWeek() {
-  currentWeekFs = prefs.getInt(PREFS_CURRENT_WEEK) ?? 1;
+  currentWeekFs = DateTime
+      .now()
+      .difference(termStart)
+      .inDays ~/ 7 + 1;
+}
+
+void loadCourses() {
+  json
+      .decode(prefs.getString(PREFS_P_COURSES) ?? '[]')
+      .forEach((map) => coursesFs.add(CourseModel.fromMap(map)));
+
+  json
+      .decode(prefs.getString(PREFS_U_COURSES) ?? '[]')
+      .forEach((map) {
+    map['teacher'] = map['info'].toString().split('[')[0];
+    coursesFs.add(CourseModel.fromMap(map));
+  });
 }

@@ -1,8 +1,9 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:hiter/page/schedule/CourseSetting.dart';
 import 'package:hiter/provider/ScheduleProvider.dart';
 import 'package:hiter/service/common.dart';
+import 'package:hiter/service/const.dart';
 import 'package:provider/provider.dart';
 
 import 'Content.dart';
@@ -16,28 +17,62 @@ class Schedule extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: DropdownButton(
-          icon: Icon(Icons.arrow_drop_down),
-          items: getListData(),
-          hint: Text(
-            '第${_schedulePage.getShowWeek()}周',
-            style: TextStyle(color: Colors.white),
-          ),
-          value: selectItemValue,
-          onChanged: (T) {
-            _schedulePage.setShowWeek(T);
-          },
-          iconEnabledColor: Colors.white,
-          iconSize: 30.0,
+        title: Row(
+          children: <Widget>[
+            Text('第${_schedulePage.getShowWeek()}周'),
+            IconButton(
+              icon: Icon(Icons.arrow_drop_down),
+              onPressed: () {
+                showModalBottomSheet(
+                  context: context,
+                  builder: (context) {
+                    return ListView(
+                      children: getWeeks().map((index) {
+                        return InkWell(
+                          child: Container(
+                            alignment: Alignment.center,
+                            height: 50.0,
+                            child: Text('第$index周'),
+                          ),
+                          onTap: () {
+                            _schedulePage.setShowWeek(index);
+                          },
+                        );
+                      }).toList(),
+                    );
+                  },
+                );
+              },
+            ),
+          ],
         ),
         actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.refresh),
+            onPressed: () {
+              EventChannel('hiter.logiase.top/sendCourse')
+                  .receiveBroadcastStream()
+                  .listen((event) {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext ctx) {
+                    return Scaffold(
+                      body: Text(
+                        event.toString(),
+                      ),
+                    );
+                  },
+                );
+              });
+            },
+          ),
           IconButton(
             icon: Icon(Icons.add),
             onPressed: () {
               showDialog(
                 context: context,
                 builder: (BuildContext ctx) {
-                  return CourseSettings(
+                  return CourseSettingContainer(
                     title: 'setting',
                   );
                 },
@@ -46,16 +81,17 @@ class Schedule extends StatelessWidget {
           )
         ],
       ),
-      body: Padding(
-        padding: EdgeInsets.symmetric(vertical: 5.0),
-        child: Column(
-          children: <Widget>[
-            Week(),
-            Expanded(
-              child: Content(),
-              //child: Center(child: Text('Test')),
-            ),
-          ],
+      body: GestureDetector(
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: 5.0),
+          child: Column(
+            children: <Widget>[
+              Week(),
+              Expanded(
+                child: Content(),
+              ),
+            ],
+          ),
         ),
       ),
     );

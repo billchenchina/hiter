@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hiter/service/common.dart';
+import 'package:hiter/service/const.dart';
+import 'package:hiter/service/store.dart';
 
 class AppProvider with ChangeNotifier {
   var _selectedTheme = selectedColorFs;
@@ -18,6 +20,7 @@ class AppProvider with ChangeNotifier {
   void setTheme(String theme) {
     _selectedTheme = theme;
     selectedColorFs = _selectedTheme;
+    prefs.setString(PREFS_SELECTED_THEME, theme);
     notifyListeners();
   }
 }
