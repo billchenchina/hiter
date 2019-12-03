@@ -22,9 +22,7 @@ class Setting extends StatelessWidget {
           ListTile(
             leading: Icon(Icons.color_lens),
             title: const Text('主题设置'),
-            trailing: IconButton(
-              icon: Icon(Icons.list),
-              onPressed: () {
+            onTap: () {
                 showDialog(
                     context: context,
                     builder: (context) {
@@ -49,6 +47,8 @@ class Setting extends StatelessWidget {
                       );
                     });
               },
+            trailing: IconButton(
+              icon: Icon(Icons.list),
             ),
           ),
           ListTile(
